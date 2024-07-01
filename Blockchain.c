@@ -24,7 +24,7 @@ typedef struct bloco { // struct para os blocos
 
     int id_bloco;
     transacao transacoes[100]; // vetor de transações (bizarro e genial)
-    int quant_transacoes;
+    int num_transacoes;
     struct bloco *anterior; // chain entre os blocos em sequência
 
 } bloco;
@@ -40,14 +40,14 @@ typedef struct blockchain { // struct para conexão dos blocos
 
 blockcahin *definir_blockchain (int t_bloco) {
 
-    blockchain *a = (blockchain *)mallo(sizeof(blockchain));
+    blockchain *bc = (blockchain *)mallo(sizeof(blockchain));
     if (a == NULL) return -1;
 
     // inicialização da estrutura
-    a->head = NULL;
-    a->atual = NULL;
-    a->tam_max_bloco = t_bloco;
-    a->num_blocos = 0;
+    bc->head = NULL;
+    bc->atual = NULL;
+    bc->tam_max_bloco = t_bloco;
+    bc->num_blocos = 0;
 
     return a;
 
@@ -60,22 +60,39 @@ bloco *definir_bloco (int id_bloco) {
 
     // inicialização da estrutura
     b->id_bloco = id_bloco;
-    b->quant_transacoes = 0;
+    b->num_transacoes = 0;
     b->anterior = NULL;
 
     return b;
 
 }
 
-void add_transacao (blockchain *a, pessoa *pagador, pessoa *recebedor, int dinheiro) {
+void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, int dinheiro) {
 
     // caso a blockchain esteja vazia ou o bloco atual esteja cheio (a ideia é criar um bloco novo, no geral)
-    if (a->atual == NULL || a->atual->quant_transacoes >= a->tam_max_bloco) {
+    if (bc->atual == NULL || bc->atual->num_transacoes >= bc->tam_max_bloco) {
 
-        bloco *novo_bloco = definir_bloco(a->quant_blocos++); // passa o id como parâmetro
-        novo_bloco->anterior = a->atual; // direciona o bloco atual (NULL ou cheio) na chain
+        bloco *novo_bloco = definir_bloco(bc->num_blocos++); // passa o id como parâmetro
+        novo_bloco->anterior = bc->atual; // direciona o bloco atual (NULL ou cheio) na chain, atrás do novo_bloco
+        bc->atual = novo_bloco; // o atual bloco na blockchain agora é o novo bloco
+
+        if (bc->head == NULL) bc->head = novo_bloco; // se o primeiro bloco não existir na blockchain, atribuir o novo
 
     }
+
+    // atualização da nova transação
+    transacao nova_transacao;
+    nova_transacao.id_transacao = bc->atual->num_transacoes; // adicionando o id
+    nova_transacao.remetente = *remetente; // inserindo os nomes dos usuários da transação
+    nova_transacao.destinatario = *destinatario; // ''
+    nova_transacao.valor_pago = dinheiro; // gravando o valor transferido
+
+    // atualização das contas bancárias (saldo)
+    remetente->conta_b -= dinheiro;
+    destinatario->conta_b += dinheiro;
+
+    // atualização da transação ao bloco atual
+    bc->atual->transacoes[bc->atual->num_transacoes++] = nova_transacao; // insere no próximo índice do vetor de transações
 
 }
 

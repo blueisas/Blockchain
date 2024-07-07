@@ -40,7 +40,7 @@ typedef struct blockchain { // struct para conexão dos blocos
 
 blockcahin *definir_blockchain (int t_bloco) {
 
-    blockchain *bc = (blockchain *)mallo(sizeof(blockchain));
+    blockchain *bc = (blockchain *)malloc(sizeof(blockchain));
     if (a == NULL) return -1;
 
     // inicialização da estrutura

@@ -44,10 +44,10 @@ pessoa *definir_pessoa(const char *nome) {
     return p; // retorna valor
 }
 
-blockcahin *definir_blockchain (int t_bloco) {
+blockchain *definir_blockchain (int t_bloco) {
 
-    blockchain *a = (blockchain *)mallo(sizeof(blockchain));
-    blockchain *bc = (blockchain *)mallo(sizeof(blockchain));
+    blockchain *a = (blockchain *)malloc(sizeof(blockchain));
+    blockchain *bc = (blockchain *)malloc(sizeof(blockchain));
     if (a == NULL) return -1;
 
     // inicialização da estrutura

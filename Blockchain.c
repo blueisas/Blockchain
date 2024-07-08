@@ -73,7 +73,7 @@ bloco *definir_bloco (int id_bloco) {
     // inicialização da estrutura
     b->id_bloco = id_bloco;
     b->num_transacoes = 0;
-    b->transacoes = (transacao*)malloc(sizeof(transacao) * N);
+    //b->transacoes = (transacao*)malloc(sizeof(transacao) * N);
     b->proximo = NULL;
 
     return b;
@@ -86,7 +86,7 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, int dinh
     if (bc->atual == NULL || bc->atual->num_transacoes >= bc->tam_max_bloco) {
 
         bloco *novo_bloco = definir_bloco(bc->num_blocos++); // passa o id como parâmetro
-        novo_bloco->anterior = bc->atual; // direciona o bloco atual (NULL ou cheio) na chain, atrás do novo_bloco
+        novo_bloco->proximo = bc->atual; // direciona o bloco atual (NULL ou cheio) na chain, atrás do novo_bloco
         bc->atual = novo_bloco; // o atual bloco na blockchain agora é o novo bloco
 
         if (bc->head == NULL) bc->head = novo_bloco; // se o primeiro bloco não existir na blockchain, atribuir o novo
@@ -95,10 +95,10 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, int dinh
 
     // atualização da nova transação
     transacao nova_transacao;
-    nova_transacao.id_transacao = bc->atual->num_transacoes; // adicionando o id
+    nova_transacao.id = bc->atual->num_transacoes; // adicionando o id
     nova_transacao.remetente = *remetente; // inserindo os nomes dos usuários da transação
     nova_transacao.destinatario = *destinatario; // ''
-    nova_transacao.valor_pago = dinheiro; // gravando o valor transferido
+    nova_transacao.valor = dinheiro; // gravando o valor transferido
 
     // atualização das contas bancárias (saldo)
     remetente->saldo -= dinheiro;

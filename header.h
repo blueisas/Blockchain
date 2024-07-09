@@ -1,49 +1,51 @@
-#define N 100
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 50
 
-typedef struct { // struct para cada pessoa
-
+typedef struct { //struct para cada membro
     int id; //importante ter um identificador único para cada membro da blockchain já que podem ter nomes iguais
-    char nome[N];
-    float saldo; 
+    char nome[MAX];
+} Membro;
 
-} pessoa;
-
-typedef struct { // struct para as transações
-
-    int id; // identificador
-    pessoa remetente;
-    pessoa destinatario;
-    float valor;
-
-} transacao;
-
-typedef struct bloco { // struct para os blocos
-
+typedef struct {
     int id;
-    transacao* transacoes; 
-    int num_transacoes;
-    struct bloco* proximo; // chain entre os blocos em sequência
+    int remetente_id;
+    int destinatario_id;
+    int valor;
+} Transacao;
 
-} bloco;
+typedef struct Bloco {
+    int id;
+    Transacao* transacoes;
+    int transacao_count;
+    struct Bloco* anterior;
+} Bloco;
 
-typedef struct { // struct para conexão dos blocos
+typedef struct {
+    int id;  //identificador para sabermos qual blockchain, já que o programa deve suportar mais de uma
+    Bloco* ultimo_bloco;
+    int bloco_tamanho;
+    Membro* membros;
+    int membro_count;
+} Blockchain;
 
-    int id; //identificador para sabermos de qual blockchain a transacao informada pertence, já que o programa deve suportar mais de uma
-    bloco* head;  // primeiro bloco
-    bloco* atual; // bloco atual
-    int t_max_bloco; // tamanho máximo do bloco (número de transações por bloco)
-    int num_blocos;  // quantidade de blocos
+Blockchain* criar_blockchain(int id, int bloco_tamanho);
 
-} blockchain;
+Bloco* criar_bloco(int id, int bloco_tamanho);
 
-//---///////////////////////////////////////////////////////////////////////////////////////////////////---
+void adicionar_membro(Blockchain* bc, int id, const char* nome);
 
-blockchain *criar_blockchain (int id, int t_bloco);
+int encontrar_membro_id(Blockchain* bc, int membro_id);
 
-void criar_arquivo(Blockchain* bc, const char* nome_arquivo);
+void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, int valor);
 
-bloco *criar_bloco (int id_bloco, int t_bloco);
+void imprimir_transacoes(Blockchain* bc, int membro_id);
 
-//---///////////////////////////////////////////////////////////////////////////////////////////////////---
+void calcular_saldos(Blockchain* bc);
 
-void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float dinheiro, const char* nome_arquivo);
+void salvar_blockchain(Blockchain* bc, const char* filename);
+
+Blockchain* carregar_blockchain(const char* filename);
+
+void menu(Blockchain** blockchains, int* num_blockchains);

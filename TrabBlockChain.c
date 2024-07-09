@@ -87,7 +87,7 @@ void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, 
     transacao->destinatario_id = destinatario_id; // Define o ID do destinatário
     transacao->valor = valor; // Define o valor da transação
 }
-
+/*
 void imprimir_transacoes(Blockchain* bc, int membro_id) {
     Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
     int count = 0;
@@ -96,7 +96,48 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
             if (t->remetente_id == membro_id || t->destinatario_id == membro_id) { // Verifica se o membro está envolvido na transação
-                printf("Transacao %d: %d pagou %d moedas a %d (Bloco %d)\n", t->id, t->remetente_id, t->valor, t->destinatario_id, bloco->id);
+                printf("Transacao %d: %d pagou $%d a %d (Bloco %d)\n", t->id, t->remetente_id, t->valor, t->destinatario_id, bloco->id);
+                count++;
+            }
+        }
+        bloco = bloco->anterior; // Move para o bloco anterior na blockchain
+    }
+
+    if (count == 0) {
+        printf("Nenhuma transacao encontrada para o membro %d.\n", membro_id);
+    } else {
+        printf("Total de transacoes encontradas para o membro %d: %d\n", membro_id, count);
+    }
+}
+*/
+void imprimir_transacoes(Blockchain* bc, int membro_id) {
+    Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
+    int count = 0;
+
+    while (bloco != NULL) { // Percorre todos os blocos a partir do último
+        for (int i = 0; i < bloco->transacao_count; i++) {
+            Transacao* t = &bloco->transacoes[i];
+            if (t->remetente_id == membro_id || t->destinatario_id == membro_id) { // Verifica se o membro está envolvido na transação
+                char* remetente_nome = "Desconhecido";
+                char* destinatario_nome = "Desconhecido";
+
+                // Encontra o nome do remetente
+                for (int j = 0; j < bc->membro_count; j++) {
+                    if (bc->membros[j].id == t->remetente_id) {
+                        remetente_nome = bc->membros[j].nome;
+                        break;
+                    }
+                }
+
+                // Encontra o nome do destinatario
+                for (int j = 0; j < bc->membro_count; j++) {
+                    if (bc->membros[j].id == t->destinatario_id) {
+                        destinatario_nome = bc->membros[j].nome;
+                        break;
+                    }
+                }
+
+                printf("Transacao %d: %s (ID %d) pagou $%d a %s (ID %d) (Bloco %d)\n", t->id, remetente_nome, t->remetente_id, t->valor, destinatario_nome, t->destinatario_id, bloco->id);
                 count++;
             }
         }
@@ -111,14 +152,13 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
 }
 
 void calcular_saldos(Blockchain* bc) {
-    // Alocar o array de saldos com base no número de membros
     int* saldos = (int*)calloc(bc->membro_count, sizeof(int));
 
     Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
     while (bloco != NULL) { // Percorre todos os blocos a partir do último
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
-            // Ajustar o acesso ao array de saldos usando os IDs dos membros
+            // Ajusta o acesso ao array de saldos usando os IDs dos membros
             saldos[t->remetente_id - 1] -= t->valor; // Reduz o valor da transação do saldo do remetente
             saldos[t->destinatario_id - 1] += t->valor; // Adiciona o valor da transação ao saldo do destinatário
         }
@@ -150,7 +190,7 @@ void calcular_saldos(Blockchain* bc) {
     // Exibir os saldos ordenados
     printf("Saldos ordenados (do maior para o menor):\n");
     for (int i = 0; i < bc->membro_count; i++) {
-        printf("Membro %d (%s): Saldo %d\n", saldos_membros[i].id, bc->membros[saldos_membros[i].id - 1].nome, saldos_membros[i].saldo);
+        printf("%s (ID %d): Saldo %d\n", bc->membros[saldos_membros[i].id - 1].nome, saldos_membros[i].id, saldos_membros[i].saldo);
     }
 
     free(saldos);

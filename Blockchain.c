@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "criacao.h"
+#include "criar.h"
 #define N 100
 
 typedef struct { // struct para cada pessoa

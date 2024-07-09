@@ -84,7 +84,6 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float di
     if (bc->atual == NULL || bc->atual->num_transacoes >= bc->tam_max_bloco) {
 
         bloco *novo_bloco = criar_bloco(bc->num_blocos++); // passa o id como parâmetro
-        novo_bloco->proximo = bc->atual; // direciona o bloco atual (NULL ou cheio) na chain, atrás do novo_bloco
         bc->atual = novo_bloco; // o atual bloco na blockchain agora é o novo bloco
 
         if (bc->head == NULL) bc->head = novo_bloco; // se o primeiro bloco não existir na blockchain, atribuir o novo
@@ -168,7 +167,7 @@ int main()
             printf("Informe o valor da transação: ");
             scanf("%d", &valor);
 
-            add_transacao (); // e dentro dessa funcao abrir arquivo dessa bc, guardar a transacao   
+            add_transacao (id_bc, );   
         } 
     }
     while (id_transacao != 0);

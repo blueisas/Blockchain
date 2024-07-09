@@ -87,32 +87,19 @@ void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, 
     transacao->destinatario_id = destinatario_id; // Define o ID do destinatário
     transacao->valor = valor; // Define o valor da transação
 }
-/*
+
 void imprimir_transacoes(Blockchain* bc, int membro_id) {
     Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
     int count = 0;
+    char* membro_nome = "Desconhecido";
 
-    while (bloco != NULL) { // Percorre todos os blocos a partir do último
-        for (int i = 0; i < bloco->transacao_count; i++) {
-            Transacao* t = &bloco->transacoes[i];
-            if (t->remetente_id == membro_id || t->destinatario_id == membro_id) { // Verifica se o membro está envolvido na transação
-                printf("Transacao %d: %d pagou $%d a %d (Bloco %d)\n", t->id, t->remetente_id, t->valor, t->destinatario_id, bloco->id);
-                count++;
-            }
+    // Encontra o nome do membro
+    for (int j = 0; j < bc->membro_count; j++) {
+        if (bc->membros[j].id == membro_id) {
+            membro_nome = bc->membros[j].nome;
+            break;
         }
-        bloco = bloco->anterior; // Move para o bloco anterior na blockchain
     }
-
-    if (count == 0) {
-        printf("Nenhuma transacao encontrada para o membro %d.\n", membro_id);
-    } else {
-        printf("Total de transacoes encontradas para o membro %d: %d\n", membro_id, count);
-    }
-}
-*/
-void imprimir_transacoes(Blockchain* bc, int membro_id) {
-    Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
-    int count = 0;
 
     while (bloco != NULL) { // Percorre todos os blocos a partir do último
         for (int i = 0; i < bloco->transacao_count; i++) {
@@ -145,9 +132,9 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
     }
 
     if (count == 0) {
-        printf("Nenhuma transacao encontrada para o membro %d.\n", membro_id);
+        printf("Nenhuma transacao encontrada para %s (ID %d).\n", membro_nome, membro_id);
     } else {
-        printf("Total de transacoes encontradas para o membro %d: %d\n", membro_id, count);
+        printf("Total de transacoes encontradas para %s (ID %d): %d\n", membro_nome, membro_id, count);
     }
 }
 

@@ -1,4 +1,3 @@
-#include <stdlib>
 #define N 100
 
 typedef struct { // struct para cada pessoa

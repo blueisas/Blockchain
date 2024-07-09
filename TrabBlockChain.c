@@ -65,11 +65,11 @@ void adicionar_membro(Blockchain* bc, int id, const char* nome) {
 
 int encontrar_membro_id(Blockchain* bc, int membro_id) {
     for (int i = 0; i < bc->membro_count; i++) {
-        if (bc->membros[i].id == membro_id) { // Check if the member ID matches
-            return membro_id; // Return the member ID if found
+        if (bc->membros[i].id == membro_id) { 
+            return membro_id; // Retorna o ID do membro se encontrado
         }
     }
-    return -1; // Member ID not found
+    return -1; // Membro nao encontrado
 }
 
 void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, int valor) {

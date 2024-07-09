@@ -1,4 +1,5 @@
 #include <stdlib>
+#define N 100
 
 typedef struct { // struct para cada pessoa
 
@@ -43,3 +44,7 @@ blockchain *criar_blockchain (int id, int t_bloco);
 void criar_arquivo(Blockchain* bc, const char* nome_arquivo);
 
 bloco *criar_bloco (int id_bloco, int t_bloco);
+
+//---///////////////////////////////////////////////////////////////////////////////////////////////////---
+
+void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float dinheiro, const char* nome_arquivo);

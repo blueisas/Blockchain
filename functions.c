@@ -40,6 +40,12 @@ typedef struct { // struct para conexão dos blocos
 
 //---///////////////////////////////////////////////////////////////////////////////////////////////////---
 
+blockchain *criar_blockchain (int id, int t_bloco);
+void criar_arquivo(Blockchain* bc, const char* nome_arquivo);
+bloco *criar_bloco (int id_bloco, int t_bloco);
+void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float dinheiro, const char* nome_arquivo);
+
+//---------------------------------------------------------------------------------------------------------
 
 blockchain *criar_blockchain (int id, int t_bloco) { //cria a blockchain e tem como parâmetro seu id e o número máximo de transações por bloco
 

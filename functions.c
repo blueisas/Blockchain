@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #define MAX 50
 
 typedef struct { //struct para cada membro
@@ -30,6 +29,19 @@ typedef struct {
     Membro* membros;
     int membro_count;
 } Blockchain;
+
+
+Blockchain* criar_blockchain(int id, int bloco_tamanho);
+Bloco* criar_bloco(int id, int bloco_tamanho);
+void adicionar_membro(Blockchain* bc, int id, const char* nome);
+int encontrar_membro_id(Blockchain* bc, int membro_id);
+void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, int valor);
+void imprimir_transacoes(Blockchain* bc, int membro_id);
+void calcular_saldos(Blockchain* bc);
+void salvar_blockchain(Blockchain* bc, const char* filename);
+Blockchain* carregar_blockchain(const char* filename);
+void menu(Blockchain** blockchains, int* num_blockchains);
+
 
 Blockchain* criar_blockchain(int id, int bloco_tamanho) { //cria a blockchain e tem como parâmetro seu id e o número máximo de transações por bloco
     Blockchain* bc = (Blockchain*)malloc(sizeof(Blockchain));

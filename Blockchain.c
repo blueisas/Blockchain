@@ -113,18 +113,19 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float di
     fclose(arquivo);
 }
 
-int main()
-{ 
+int main() { 
+    
     int id_bc, tam_bloco;
 
     printf("Criando as blockchains...\n\n");
-    do
-    {
+    
+    do {
+        
         printf("Informe o id da blockchain (0 para terminar): ");
         scanf("%d", &id_bc);
 
-        if (id_bc != 0) //quando o id_bc for zero não irá criar uma blockchain
-        {
+        if (id_bc != 0) { //quando o id_bc for zero não irá criar uma blockchain
+            
             printf("Informe o número de transações máximo por bloco: ");
             scanf("%d", &tam_bloco);
 
@@ -134,22 +135,21 @@ int main()
             snprintf(nome_arquivo, N, "bc%d.dat", id_bc);
 
             criar_arquivo(bc, nome_arquivo); //criamos o arquivo que vai salvar a blockchain
+            
         }
-    }
-    while (id_bc != 0); 
+    } while (id_bc != 0); 
 
     int id_transacao, id_remetente, id_destinatario;
     char nome_remetente[N], nome_destinatario[N];
     float valor;
 
     printf("Criando as transações...\n\n");
-    do
-    {
+    do {
         printf("Informe o id da transação (0 para terminar): ");
         scanf("%d", &id_transacao);
 
-        if (id_transacao != 0) //não irá ser criada uma transação de id 0
-        { 
+        if (id_transacao != 0) { //não irá ser criada uma transação de id 0
+        
             printf("Informe o id da blockchain dessa transação: ");
             scanf("%d", &id_bc);
 
@@ -170,8 +170,7 @@ int main()
 
             add_transacao (); // e dentro dessa funcao abrir arquivo dessa bc, guardar a transacao   
         } 
-    }
-    while (id_transacao != 0);
+    } while (id_transacao != 0);
 
 }
 

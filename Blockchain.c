@@ -62,7 +62,7 @@ void criar_arquivo(Blockchain* bc, const char* nome_arquivo) { //criação do ar
         printf("Erro ao abrir o arquivo para escrita.\n");
         return;
     }
-    fwrite(&bc->tam_max_bloco, sizeof(int), 1, arquivo);
+    fwrite(&bc->t_max_bloco, sizeof(int), 1, arquivo);
     fclose(arquivo);
 }
 
@@ -71,7 +71,7 @@ bloco *criar_bloco (int id_bloco, int t_bloco) {
     if (b == NULL) return NULL;
 
     // inicialização da estrutura
-    b->id_bloco = id_bloco;
+    b->id = id_bloco;
     b->num_transacoes = 0;
     b->transacoes = (transacao*)malloc(sizeof(transacao) * t_bloco);
     b->proximo = NULL;

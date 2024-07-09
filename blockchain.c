@@ -111,7 +111,8 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, int dinh
 }
 
 
-int main(){
+int main () {
+
     pessoa p; // chamando struct pessoa
     int t_bloco, quantidade_membros;
 
@@ -126,14 +127,16 @@ int main(){
 
     pessoa *membros[quantidade_membros];
     for (int i = 0; i < quantidade_membros; i++) { // repetição para recolher informações de cada pessoa
+
         char nome[N];
         printf("Digite o nome do membro %d: ", i + 1);
         scanf("%s", nome);
         membros[i] = definir_pessoa(nome);
+
     }
 
     int opcao;
-    do {                   // switch case para o usuário escolher o que ele quer
+    do {  // switch case para o usuário escolher o que ele quer
         printf("\nEscolha uma opção:\n");
         printf("1. Adicionar transação\n");
         printf("2. Exibir transações de um membro\n");
@@ -192,8 +195,4 @@ int main(){
         }
     } while (opcao != 4);
 
-
-   
-
-   
 }

@@ -49,7 +49,7 @@ blockchain *criar_blockchain (int id, int t_bloco) { //cria a blockchain e tem c
     bc->id = id;
     bc->head = NULL; //blockchain inicialmente vazia
     bc->atual = NULL;
-    bc->tam_max_bloco = t_bloco;
+    bc->t_max_bloco = t_bloco;
     bc->num_blocos = 0;
 
     return bc;
@@ -108,7 +108,7 @@ void add_transacao (blockchain *bc, pessoa *pagador, pessoa *recebedor, float di
         printf("Erro ao abrir o arquivo para escrita.\n");
         return;
     }
-    fwrite(&nova_transacao, sizeof(Transacao), 1, arquivo); //adicionamos a nova transação ao arquivo da blockchain em que ela ocorre
+    fwrite(&nova_transacao, sizeof(transacao), 1, arquivo); //adicionamos a nova transação ao arquivo da blockchain em que ela ocorre
     fclose(arquivo);
 }
 

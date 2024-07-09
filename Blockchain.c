@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "criar.h"
+#include "header.h"
 #define N 100
 
 int main() { 

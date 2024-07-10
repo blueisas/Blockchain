@@ -224,7 +224,7 @@ void salvar_blockchain(Blockchain* bc, const char* filename) { // Função para 
 }
 
 Blockchain* carregar_blockchain(const char* filename) {
-    FILE* file = fopen(filename, "r");
+    FILE* file = fopen(filename, "r"); // Abre o arquivo em modo de leitura
     if (!file) {
         perror("Erro ao abrir o arquivo");
         return NULL;
@@ -233,8 +233,8 @@ Blockchain* carregar_blockchain(const char* filename) {
     int id, bloco_tamanho, membro_count, trans_count;
     fscanf(file, "BC %d %d %d %d\n", &id, &bloco_tamanho, &membro_count, &trans_count);
 
-    Blockchain* bc = criar_blockchain(id, bloco_tamanho);
-    for (int i = 0; i < membro_count; i++) {
+    Blockchain* bc = criar_blockchain(id, bloco_tamanho);  // Cria uma nova blockchain com o ID e o tamanho do bloco lidos do arquivo
+    for (int i = 0; i < membro_count; i++) { // Loop para ler e adicionar os membros à blockchain
         int membro_id;
         char nome[50];
         fscanf(file, "MB %d %s\n", &membro_id, nome);
@@ -243,26 +243,26 @@ Blockchain* carregar_blockchain(const char* filename) {
 
     Bloco* bloco = NULL;
     int bloco_id, transacao_count;
-    while (fscanf(file, "BL %d %d\n", &bloco_id, &transacao_count) == 2) {
+    while (fscanf(file, "BL %d %d\n", &bloco_id, &transacao_count) == 2) { // Loop para ler e adicionar os blocos à blockchain
         Bloco* novo_bloco = criar_bloco(bloco_id, bloco_tamanho);
         if (bloco == NULL)
         {
-            bc->primeiro_bloco = novo_bloco;            
+            bc->primeiro_bloco = novo_bloco;  // Se for o primeiro bloco, define-o como o primeiro bloco da blockchain      
         }
         else
         {
-            bloco->proximo = novo_bloco;
+            bloco->proximo = novo_bloco; // Se não, adiciona-o à cadeia de blocos
         }
-        bc->ultimo_bloco = novo_bloco;
-        novo_bloco->transacao_count = transacao_count;
-        for (int i = 0; i < transacao_count; i++) {
+        bc->ultimo_bloco = novo_bloco; // Atualiza o ponteiro para o último bloco da blockchain
+        novo_bloco->transacao_count = transacao_count; // Define a contagem de transações do novo bloco
+        for (int i = 0; i < transacao_count; i++) { // Loop para ler e adicionar as transações ao bloco
             Transacao* t = &novo_bloco->transacoes[i];
             fscanf(file, "TR %d %d %d %d\n", &t->id, &t->remetente_id, &t->destinatario_id, &t->valor);
             bc->transacao_count++;
         }
-        bloco = novo_bloco;
+        bloco = novo_bloco; // Avança para o próximo bloco
     }
-    bc->ultimo_bloco = bloco;
+    bc->ultimo_bloco = bloco; // Garante que o ponteiro para o último bloco da blockchain esteja correto
 
     fclose(file);
     return bc;
@@ -403,19 +403,20 @@ void menu(Blockchain** blockchains, int* num_blockchains) {
 }
 
 int main() {
-    Blockchain** blockchains = NULL;
+    Blockchain** blockchains = NULL; // Inicializa um ponteiro para um array de ponteiros para estruturas Blockchain
     int num_blockchains = 0;
 
     menu(blockchains, &num_blockchains);
 
+    // Loop para liberar a memória alocada para cada blockchain e seus componentes
     for (int i = 0; i < num_blockchains; i++) {
         free(blockchains[i]->membros);
-        Bloco* bloco = blockchains[i]->primeiro_bloco;
+        Bloco* bloco = blockchains[i]->primeiro_bloco; // Inicializa um ponteiro para percorrer os blocos da blockchain atual
         while (bloco != NULL) {
-            Bloco* proximo = bloco->proximo;
+            Bloco* proximo = bloco->proximo; // Salva o ponteiro para o próximo bloco antes de liberar o atual
             free(bloco->transacoes);
             free(bloco);
-            bloco = proximo;
+            bloco = proximo; // Avança para o próximo bloco
         }
         free(blockchains[i]);
     }

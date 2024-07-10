@@ -19,15 +19,17 @@ typedef struct Bloco {
     int id;
     Transacao* transacoes;
     int transacao_count;
-    struct Bloco* anterior;
+    struct Bloco* proximo;
 } Bloco;
 
 typedef struct {
     int id;  //identificador para sabermos qual blockchain, já que o programa deve suportar mais de uma
+    Bloco* primeiro_bloco;
     Bloco* ultimo_bloco;
     int bloco_tamanho;
     Membro* membros;
     int membro_count;
+    int transacao_count;
 } Blockchain;
 
 
@@ -49,10 +51,12 @@ Blockchain* criar_blockchain(int id, int bloco_tamanho) { //cria a blockchain e 
 
     // inicialização da estrutura
     bc->id = id;
+    bc->primeiro_bloco = NULL;
     bc->ultimo_bloco = NULL;
     bc->bloco_tamanho = bloco_tamanho;
     bc->membros = NULL;
     bc->membro_count = 0;
+    bc->transacao_count = 0;
     return bc;
 }
 
@@ -64,13 +68,13 @@ Bloco* criar_bloco(int id, int bloco_tamanho) {
     bloco->id = id;
     bloco->transacoes = (Transacao*)malloc(sizeof(Transacao) * bloco_tamanho); 
     bloco->transacao_count = 0;
-    bloco->anterior = NULL;
+    bloco->proximo = NULL;
     return bloco;
 }
 
 void adicionar_membro(Blockchain* bc, int id, const char* nome) {
     bc->membros = (Membro*)realloc(bc->membros, sizeof(Membro) * (bc->membro_count + 1)); // Realoca memória para adicionar um novo membro
-    bc->membros[bc->membro_count].id = bc->membro_count + 1; // Define o ID do novo membro começando de 1
+    bc->membros[bc->membro_count].id = id; // Define o ID do novo membro começando de 1
     strcpy(bc->membros[bc->membro_count].nome, nome); // Copia o nome do novo membro
     bc->membro_count++; // Incrementa o contador de membros na blockchain
 }
@@ -88,20 +92,29 @@ void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, 
     Bloco* bloco = bc->ultimo_bloco; // Obtém o último bloco da blockchain
     if (bloco == NULL || bloco->transacao_count >= bc->bloco_tamanho) { // Verifica se precisa criar um novo bloco
         Bloco* novo_bloco = criar_bloco((bloco == NULL) ? 1 : bloco->id + 1, bc->bloco_tamanho); // Cria um novo bloco se necessário
-        novo_bloco->anterior = bloco; // Define o bloco anterior ao novo bloco criado
         bc->ultimo_bloco = novo_bloco; // Atualiza o ponteiro para o último bloco na blockchain
+        if (bloco == NULL)
+        {
+            bc->primeiro_bloco = novo_bloco;
+        }
+        else
+        {
+            bloco->proximo = novo_bloco; // Define o bloco anterior ao novo bloco criado
+        }
         bloco = novo_bloco; // Define o bloco atual como o novo bloco criado
     }
 
     Transacao* transacao = &bloco->transacoes[bloco->transacao_count++]; // Obtém a próxima posição no array de transações do bloco
-    transacao->id = (bloco->anterior == NULL ? 0 : bloco->anterior->transacao_count) + bloco->transacao_count; // Define o ID da transação
+    transacao->id = bc->transacao_count + 1; // Define o ID da transação
     transacao->remetente_id = remetente_id; // Define o ID do remetente
     transacao->destinatario_id = destinatario_id; // Define o ID do destinatário
     transacao->valor = valor; // Define o valor da transação
+
+    bc->transacao_count++;
 }
 
 void imprimir_transacoes(Blockchain* bc, int membro_id) {
-    Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
+    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do último bloco na blockchain
     int count = 0;
     char* membro_nome = "Desconhecido";
 
@@ -140,7 +153,7 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
                 count++;
             }
         }
-        bloco = bloco->anterior; // Move para o bloco anterior na blockchain
+        bloco = bloco->proximo; // Move para o bloco anterior na blockchain
     }
 
     if (count == 0) {
@@ -153,7 +166,7 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
 void calcular_saldos(Blockchain* bc) {
     int* saldos = (int*)calloc(bc->membro_count, sizeof(int));
 
-    Bloco* bloco = bc->ultimo_bloco; // Começa a partir do último bloco na blockchain
+    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do último bloco na blockchain
     while (bloco != NULL) { // Percorre todos os blocos a partir do último
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
@@ -161,7 +174,7 @@ void calcular_saldos(Blockchain* bc) {
             saldos[t->remetente_id - 1] -= t->valor; // Reduz o valor da transação do saldo do remetente
             saldos[t->destinatario_id - 1] += t->valor; // Adiciona o valor da transação ao saldo do destinatário
         }
-        bloco = bloco->anterior; // Move para o bloco anterior na blockchain
+        bloco = bloco->proximo; // Move para o bloco anterior na blockchain
     }
 
     typedef struct { // Struct auxiliar para armazenar os saldos com os IDs dos membros para facilitar a ordenação
@@ -196,26 +209,26 @@ void calcular_saldos(Blockchain* bc) {
     free(saldos_membros);
 }
 
-void salvar_blockchain(Blockchain* bc, const char* filename) {
-    FILE* file = fopen(filename, "w");
+void salvar_blockchain(Blockchain* bc, const char* filename) { // Função para salvar a blockchain em um arquivo
+    FILE* file = fopen(filename, "w"); // Abre o arquivo em modo de escrita
     if (!file) {
         perror("Erro ao abrir o arquivo");
         return;
     }
 
-    fprintf(file, "%d %d %d\n", bc->id, bc->bloco_tamanho, bc->membro_count);
+    fprintf(file, "BC %d %d %d %d\n", bc->id, bc->bloco_tamanho, bc->membro_count, bc->transacao_count);
     for (int i = 0; i < bc->membro_count; i++) {
-        fprintf(file, "%d %s\n", bc->membros[i].id, bc->membros[i].nome);
+        fprintf(file, "MB %d %s\n", bc->membros[i].id, bc->membros[i].nome);
     }
 
-    Bloco* bloco = bc->ultimo_bloco;
+    Bloco* bloco = bc->primeiro_bloco;
     while (bloco != NULL) {
-        fprintf(file, "Bloco %d %d\n", bloco->id, bloco->transacao_count);
+        fprintf(file, "BL %d %d\n", bloco->id, bloco->transacao_count);
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
-            fprintf(file, "%d %d %d %d\n", t->id, t->remetente_id, t->destinatario_id, t->valor);
+            fprintf(file, "TR %d %d %d %d\n", t->id, t->remetente_id, t->destinatario_id, t->valor);
         }
-        bloco = bloco->anterior;
+        bloco = bloco->proximo;
     }
 
     fclose(file);
@@ -228,26 +241,35 @@ Blockchain* carregar_blockchain(const char* filename) {
         return NULL;
     }
 
-    int id, bloco_tamanho, membro_count;
-    fscanf(file, "%d %d %d", &id, &bloco_tamanho, &membro_count);
+    int id, bloco_tamanho, membro_count, trans_count;
+    fscanf(file, "BC %d %d %d %d\n", &id, &bloco_tamanho, &membro_count, &trans_count);
 
     Blockchain* bc = criar_blockchain(id, bloco_tamanho);
     for (int i = 0; i < membro_count; i++) {
         int membro_id;
         char nome[50];
-        fscanf(file, "%d %s", &membro_id, nome);
+        fscanf(file, "MB %d %s\n", &membro_id, nome);
         adicionar_membro(bc, membro_id, nome);
     }
 
     Bloco* bloco = NULL;
     int bloco_id, transacao_count;
-    while (fscanf(file, "Bloco %d %d", &bloco_id, &transacao_count) == 2) {
+    while (fscanf(file, "BL %d %d\n", &bloco_id, &transacao_count) == 2) {
         Bloco* novo_bloco = criar_bloco(bloco_id, bloco_tamanho);
+        if (bloco == NULL)
+        {
+            bc->primeiro_bloco = novo_bloco;            
+        }
+        else
+        {
+            bloco->proximo = novo_bloco;
+        }
+        bc->ultimo_bloco = novo_bloco;
         novo_bloco->transacao_count = transacao_count;
-        novo_bloco->anterior = bloco;
         for (int i = 0; i < transacao_count; i++) {
             Transacao* t = &novo_bloco->transacoes[i];
-            fscanf(file, "%d %d %d %d", &t->id, &t->remetente_id, &t->destinatario_id, &t->valor);
+            fscanf(file, "TR %d %d %d %d\n", &t->id, &t->remetente_id, &t->destinatario_id, &t->valor);
+            bc->transacao_count++;
         }
         bloco = novo_bloco;
     }
@@ -293,7 +315,7 @@ void menu(Blockchain** blockchains, int* num_blockchains) {
                 scanf("%s", nome);
                 if (blockchain_id > 0 && blockchain_id <= *num_blockchains) {
                     Blockchain* bc = blockchains[blockchain_id - 1];
-                    adicionar_membro(bc, bc->membro_count, nome);
+                    adicionar_membro(bc, bc->membro_count + 1, nome);
                     printf("Membro adicionado com ID %d.\n", bc->membro_count); // Imprime o ID do novo membro
                 } else {
                     printf("Blockchain nao encontrada.\n");

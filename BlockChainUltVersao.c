@@ -87,7 +87,7 @@ void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, 
         }
         else
         {
-            bloco->proximo = novo_bloco; // Define o bloco anterior ao novo bloco criado
+            bloco->proximo = novo_bloco; // Define o proximo do bloco atual como o novo bloco criado
         }
         bloco = novo_bloco; // Define o bloco atual como o novo bloco criado
     }
@@ -102,7 +102,7 @@ void adicionar_transacao(Blockchain* bc, int remetente_id, int destinatario_id, 
 }
 
 void imprimir_transacoes(Blockchain* bc, int membro_id) {
-    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do último bloco na blockchain
+    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do primeiro bloco na blockchain
     int count = 0;
     char* membro_nome = "Desconhecido";
 
@@ -114,7 +114,7 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
         }
     }
 
-    while (bloco != NULL) { // Percorre todos os blocos a partir do último
+    while (bloco != NULL) { // Percorre todos os blocos a partir do primeiro
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
             if (t->remetente_id == membro_id || t->destinatario_id == membro_id) { // Verifica se o membro está envolvido na transação
@@ -154,15 +154,15 @@ void imprimir_transacoes(Blockchain* bc, int membro_id) {
 void calcular_saldos(Blockchain* bc) {
     int* saldos = (int*)calloc(bc->membro_count, sizeof(int));
 
-    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do último bloco na blockchain
-    while (bloco != NULL) { // Percorre todos os blocos a partir do último
+    Bloco* bloco = bc->primeiro_bloco; // Começa a partir do primeiro bloco na blockchain
+    while (bloco != NULL) { // Percorre todos os blocos a partir do primeiro
         for (int i = 0; i < bloco->transacao_count; i++) {
             Transacao* t = &bloco->transacoes[i];
             // Ajusta o acesso ao array de saldos usando os IDs dos membros
             saldos[t->remetente_id - 1] -= t->valor; // Reduz o valor da transação do saldo do remetente
             saldos[t->destinatario_id - 1] += t->valor; // Adiciona o valor da transação ao saldo do destinatário
         }
-        bloco = bloco->proximo; // Move para o bloco anterior na blockchain
+        bloco = bloco->proximo; // Move para o proximo bloco na blockchain
     }
 
     typedef struct { // Struct auxiliar para armazenar os saldos com os IDs dos membros para facilitar a ordenação
@@ -204,6 +204,7 @@ void salvar_blockchain(Blockchain* bc, const char* filename) { // Função para 
         return;
     }
 
+    // Escreve no arquivo
     fprintf(file, "BC %d %d %d %d\n", bc->id, bc->bloco_tamanho, bc->membro_count, bc->transacao_count);
     for (int i = 0; i < bc->membro_count; i++) {
         fprintf(file, "MB %d %s\n", bc->membros[i].id, bc->membros[i].nome);

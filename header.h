@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #define MAX 50
 
 typedef struct { //struct para cada membro
@@ -19,15 +16,17 @@ typedef struct Bloco {
     int id;
     Transacao* transacoes;
     int transacao_count;
-    struct Bloco* anterior;
+    struct Bloco* proximo;
 } Bloco;
 
 typedef struct {
     int id;  //identificador para sabermos qual blockchain, já que o programa deve suportar mais de uma
+    Bloco* primeiro_bloco;
     Bloco* ultimo_bloco;
     int bloco_tamanho;
     Membro* membros;
     int membro_count;
+    int transacao_count;
 } Blockchain;
 
 Blockchain* criar_blockchain(int id, int bloco_tamanho);

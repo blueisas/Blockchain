@@ -12,12 +12,12 @@ int main() {
 
     for (int i = 0; i < num_blockchains; i++) {
         free(blockchains[i]->membros);
-        Bloco* bloco = blockchains[i]->ultimo_bloco;
+        Bloco* bloco = blockchains[i]->primeiro_bloco;
         while (bloco != NULL) {
-            Bloco* anterior = bloco->anterior;
+            Bloco* proximo = bloco->proximo;
             free(bloco->transacoes);
             free(bloco);
-            bloco = anterior;
+            bloco = proximo;
         }
         free(blockchains[i]);
     }
